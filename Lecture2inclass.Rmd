@@ -1,0 +1,59 @@
+---
+title: "Visualization Lecture 2 in class"
+author: "Hannah Damico"
+output: html_notebook
+---
+
+Go ahead and add this file to a new project. I call mine 'BIOS824'. 
+
+You can use RStudio to create a new git project, and then check this file in
+
+Go ahead and make a change in your file, and then we will commit the changes. RStudio calls this 'staging' the file
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+You can add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+Depending on your RStudio packages, you may need to install these packages. Note that if they are already available you do not need (and shouldn't!) install them.
+
+
+```{r}
+install.packages("cli")
+```
+
+```{r}
+install.packages("remotes")
+```
+
+```{r}
+remotes::install_github("rstudio/r2d3")
+```
+
+Write the code necessary to load the library.
+
+```{r}
+library(r2d3)
+```
+
+You will need to create the 'barchart.js' file and also the CSS file 'chord.css'. I prefer putting my javascript files in a 'js' folder and my css files in a 'css' folder. Need to update the example code. 
+
+```{r}
+r2d3(data = c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "./js/barchart.js")
+```
+
+
+You will need to create the 'chord.js' file and also the CSS file 'chord.css'. I prefer putting my javascript files in a 'js' folder and my css files in a 'css' folder. Need to update the example code. 
+
+```{r}
+r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "./js/chord.js")
+```
+
+
+
+```{r}
+plot(cars)
+```
+
+
+
