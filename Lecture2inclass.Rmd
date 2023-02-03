@@ -39,7 +39,7 @@ library(r2d3)
 You will need to create the 'barchart.js' file and also the CSS file 'chord.css'. I prefer putting my javascript files in a 'js' folder and my css files in a 'css' folder. Need to update the example code. 
 
 ```{r}
-r2d3(data = c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "./js/barchart.js")
+r2d3(data = c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "barchart.js")
 ```
 
 
