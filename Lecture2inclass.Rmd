@@ -19,15 +19,15 @@ Depending on your RStudio packages, you may need to install these packages. Note
 
 
 ```{r}
-install.packages("cli")
+# install.packages("cli")
 ```
 
 ```{r}
-install.packages("remotes")
+# install.packages("remotes")
 ```
 
 ```{r}
-remotes::install_github("rstudio/r2d3")
+# remotes::install_github("rstudio/r2d3")
 ```
 
 Write the code necessary to load the library.
