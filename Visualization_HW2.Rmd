@@ -1,0 +1,12 @@
+---
+title: "Visualization Homework 2"
+author: "Hannah Damico"
+date: "2023-02-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
