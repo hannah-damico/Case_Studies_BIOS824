@@ -1,5 +1,6 @@
 ---
 title: "Homework 3: Using RStudio to analyze and visualize a sample dataset"
+author: "Hannah Damico"
 output:
   html_notebook: default
   pdf_document: default
