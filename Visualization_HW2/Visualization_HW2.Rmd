@@ -74,7 +74,7 @@ combined_df.to_csv("combined_data.csv", index=False)
 ## Import Data
 
 ```{r, import}
-combined_data <- read_csv("../combined_data.csv")
+combined_data <- read_csv("/Users/hannahdamico/Desktop/W23/BIOS 824 - Case Studies/combined_data.csv")
 # View(combined_data)
 str(combined_data)
 ```
