@@ -231,7 +231,7 @@ data.frame(spec_ids, mean_hf, sd_hf, range_hf, mean_wt, sd_wt, range_wt) %>%
  
 Q9. Now take the dataset and create a table with the range, mean, and standard deviation for the hindfoot and the weight for each species.
 
-```{r}
+```{r results='asis'}
 library(arsenal)
 summary(tableby(species_id ~ weight + hindfoot_length, data = surveys_complete))
 ```
