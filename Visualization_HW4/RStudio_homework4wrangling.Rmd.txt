@@ -1,0 +1,50 @@
+---
+title: "Data wrangling and reverse engineering"
+output: html_notebook
+---
+
+This is a hopefully straightforward set of tasks. As part of the homework you will find the file RADxUP_CDE_Tracking_full.csv
+
+This is a file saved from a fairly complicated set of questionnaires from a real set of projects. Each row is a project, and each column is a item from the questionnaire. In order to evaluate the responses, I created a simple heatmap of some of the answers. The data is from the first 25 rows and columns 12-42. The heatmap I made is also attached in the homework, called newplot.png. 
+
+Task 1. Create the code necessary to load the file and prepare it for heatmaply. Insert the code below. 
+
+```{r}
+
+```
+
+How many rows and columns are in the file? 
+
+
+Task 2. Create a simple heatmap using heatmaply that replicates/approximates the heatmap I put in the homework. Insert your code and heatmap below. Note that you will need to adjust the fontsize or else the plotsize to make the project names legible. 
+
+```{r}
+
+```
+
+Task 3. Create a heatmap and adjust the options to try and show all the projects in a simple map. Insert your code below:
+
+
+```{r}
+
+```
+
+Task 4. Now start mapping additional columns. Create a series of plots (or a single legible plot if you can!) for all the columns. You will need to shorten/edit the column names at some point in the file. Try and keep the column names informative/meaningful. Insert your code below
+
+
+```{r}
+
+```
+
+Task 5. Come up with another way to plot these data in a heatmap. Feel free to explore other heatmap plotting tools in R Studio. Insert your code below:
+
+```{r}
+
+```
+
+Task 6. While heatmaps are very compact and an efficient way to show this kind of data, experiment with some other methods. Can you find another way to plot/visualize these data? Include your code below:
+
+```{r}
+
+```
+

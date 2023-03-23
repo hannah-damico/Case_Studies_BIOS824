@@ -1,0 +1,207 @@
+---
+title: "Homework 4 - back to r2d3, on to networkD3 and heatmaply"
+output: html_notebook
+---
+
+This is an [R Markdown]( http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+It is a bad practice to include install code in a notebook file, as you should not repetitively install the same packages. If these packages are not installed and your environment does not offer to install them, you will need to uncomment and install these packages. 
+
+```{r install}
+#install.packages("devtools")
+#devtools::install_github("rstudio/r2d3")
+#install.packages("networkD3")
+#install.packages('heatmaply')
+
+```
+
+This will load these packages into your environment, if they are not already loaded.
+
+```{r setup}
+library(r2d3)
+library(networkD3)
+library(heatmaply)
+```
+
+Lets try out the basic example plot, just to be sure all is working
+
+```{r}
+plot(cars)
+```
+
+So far so good. Not a very interesting plot, but you should see 'speed' on the x axis and 'dist' on the y axis. 
+
+For most of this homework we will work with d3 inside of R next. These are handy resources to understand how r2d3 works:
+
+https://rstudio.github.io/r2d3/articles/introduction.html
+https://rstudio.github.io/r2d3/articles/dependencies.html 
+https://rstudio.github.io/r2d3/articles/learning_d3.html 
+
+
+For our first graph using the r2d3 package we installed and loaded above we will build a simple barchart. This is almost precisely what we did together in Lecture 2 in classs. Follow the instructions at https://rstudio.github.io/r2d3/articles/introduction.html to build the first simple barchart. I like to put all my javascript files in a directory inside my current directory, so rather than including script = "barchart.js" I write script = "./js/barchart.js". 
+
+
+```{r}
+
+```
+
+You just created your first d3 visualization! Not all that special, but we will get more sophisticated. 
+
+Question 1. Recreate the above barchart using ggplot2. Put the code in the box below. 
+
+
+```{r}
+
+```
+
+Now lets get a little more sophisticated. Take a look at the d3.js example library at https://observablehq.com/@d3/gallery  d3 is an incredibly flexible and power visualization environment, all written in javascript and designed to be run in a browser. 
+
+Now we will run a chord diagram example. This time we need a javascript file and a css file to provide the necessary styles for the chord. I also put all my css files in a css folder inside my project directory, to keep things organized. This example is from https://rstudio.github.io/r2d3/articles/gallery/chord/ 
+
+```{r}
+r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "./js/chord.js", css = "./css/chord.css")
+
+```
+
+Question 2. Rewrite the code without the css and run it. How different is it? Include the code below:
+
+```{r}
+
+```
+
+Now lets experiment with a heatmap using heatmaply. At least in my environment, the mtcars dataset is installed by default. 
+
+```{r}
+heatmaply(mtcars)
+```
+
+While that is a heatmap, it is a rather saturated heatmap. Lets redo that map using the 'percentize' function:
+
+```{r}
+heatmaply(
+  percentize(mtcars),
+  xlab = "Features",
+  ylab = "Cars", 
+  main = "Data transformation using 'percentize'"
+)
+```
+
+Question 3. Specifying a normalization method, like percentize above, can aid in the interpretation. However, answering questions like 'which car has the best mpg' is hard to do with this method. Look through the different heatmaply options and find a heatmap you think is useful in understanding which cars have the best (and worst) mpg. Put the code below:
+
+```{r}
+
+```
+
+Question 4. What car has the best mpg (highest number) and which one has the worst (lowest number). Write them below:
+
+
+Next, we will build correlative heatmap, where the colors are related to the correlation between data points:
+
+```{r}
+heatmaply_cor(
+  cor(mtcars),
+  xlab = "Features",
+  ylab = "Features",
+  k_col = 2,
+  k_row = 2
+)
+```
+
+There is a lot of hard work that heatmaply did in building that correlated heat map. 
+
+
+Question 5. Now build a heatmap that uses point sources to indicate correlation and p-value. Include the code below. 
+
+```{r}
+
+```
+
+Now we are going to shift to yet another d3.js based graph type, a force network. There is a package that wraps all the code necessary to do that, to make it very easy:
+
+
+```{r}
+# Load data
+#data(MisLinks, MisNodes)
+data(MisLinks)
+data(MisNodes)
+# Create graph
+forceNetwork(Links = MisLinks, Nodes = MisNodes, Source = "source",
+             Target = "target", Value = "value", NodeID = "name",
+             Nodesize = "size",
+             radiusCalculation = "d.nodesize/2+1",
+             Group = "group", opacity = 0.85, zoom = TRUE, arrows = TRUE)
+
+
+```
+
+Experiment with some of the forceNetwork options in the above example. 
+
+About Graphs and graph representations
+Note that a force diagram requires nodes and edges to be able to visualize. For instance, a map of term courses, the faculty teaching courses, and students taking courses is a natural kind of data set for a force graph. In the node-edge nomenclature, faculty are one category of nodes, courses are another category of nodes, and students are another category of nodes. The edges 'connect' a particular faculty to a class they are teaching and a student to a class they are taking. And a student can have multiple classes (multiple edges) and a faculty member can have multiple classes they are teaching. These types of graphs are very powerful, as you can calculate the connectedness of nodes as well as the number of edges bewteen any two nodes. Visualizing these data lets you visually interrogate the results of many different graph manifolds and graph-theoretic approaches. In graph theory it is easy to ask questions that are very hard to formulate (but not impossible) in more classic set theory, like 'how many faculty have taught the same course three or more years', or 'how many students are taking these two classes at the same time'. An example, looking at EHR data, might be 'how many patients in the past three years have been given three or more courses of doxirubicin followed by at least one course of cyclophosphamide'. 
+
+One of the features of graphs is being able to easily encode and display temporal information through the use of directed acyclic graphs (DAGs). DAGs are useful in representing many kinds of data. All of the Open Biomedical Ontologies, including Gene Ontology, are represented as DAGs 
+
+Question 6. Take another data set (include it in your homework submission please!) and visualize it in a force diagram. 
+
+
+Put your code in the section below:
+
+```{r}
+
+```
+
+Now we are going to use r2d3 to create a bubble graph. This is mostly useful for visualizing data that are a collection of things (objects) with a single scalar. For instance, faculty sized by the number of publications. Or countries by population. Or clinical trials by number of participants. 
+
+To run the following script, you need to download the flare.csv file and bubbles.js
+See https://rstudio.github.io/r2d3/articles/gallery/bubbles/ and https://github.com/rstudio/r2d3/tree/master/vignettes/gallery/bubbles 
+
+```{r}
+r2d3(data = read.csv("flare.csv"), width=400, height=400, d3_version = 4, script = "./js/bubbles.js")
+```
+
+
+Question 7. Find an appropriate dataset and visualize it using a bubble plot. Include the dataset in your homework submission. 
+
+Put your code below:
+
+```{r}
+
+```
+
+Finally, we are going to graph this same data in a radial tree. This is also a graph representation. We are going to use the same data as in the bubble graph. https://rstudio.github.io/r2d3/articles/gallery/radialtree/ has the javascript and css files.
+
+```{r}
+r2d3(data = read.csv("flare.csv"), d3_version = 4, script = "./js/radialtree.js")
+r2d3(data = read.csv("flare.csv"), d3_version = 4, script = "./js/radialtree.js", css = "./css/radialtree.css")
+```
+
+This generates two different radialtree graphs. If they look identical, you may not have the css file in the right place for it to be loaded. 
+
+Question 8. What is the difference between the two graphs? Which one do you prefer? 
+
+
+
+Now lets build a cartogram, or map. Lets look just at the US. You will need to use code and files at:
+
+https://rstudio.github.io/r2d3/articles/gallery/cartogram/
+https://github.com/topojson/topojson/releases/tag/v3.0.2
+https://gist.githubusercontent.com/mbostock/4090846/raw/us.json
+
+Building the cartogram is a lengthy process. It will take multiple seconds depending on the computer you run it on.  
+
+```{r}
+r2d3(data = jsonlite::read_json("us.json"), d3_version = 3, dependencies = "./js/topojson.min.js", script = "./js/cartogram.js")
+r2d3(data = jsonlite::read_json("us.json"), d3_version = 3, dependencies = "./js/topojson.min.js", script = "./js/cartogram.js", css = "./css/cartogram.css")
+```
+
+These two graphs should look different, assuming the css file is loaded. 
+
+Question 9. What are the differences between the css cartogram and the cartogram without the css file.
+
+
+Question 10. Extra credit.  Take a look at https://observablehq.com/@d3/non-contiguous-cartogram The data for obesity is manually loaded into the r2d3 javascript file, but it is not changing the color of the states based on the obesity rates in each state. Can you fix the javascript to make it properly color the state? This will require javascript coding skill as well as troubleshooting. It may not be possible to fix, since the authors of the r2d3 example were unable to make it work, even with the d3 example available. 
+
+
+End of Homework.
