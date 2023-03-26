@@ -1,6 +1,7 @@
 ---
 title: "Homework 4 - back to r2d3, on to networkD3 and heatmaply"
-output: html_notebook
+author: "Hannah Damico"
+output: pdf_document
 ---
 
 This is an [R Markdown]( http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
@@ -23,6 +24,7 @@ This will load these packages into your environment, if they are not already loa
 library(r2d3)
 library(networkD3)
 library(heatmaply)
+library(tidyverse)
 ```
 
 Lets try out the basic example plot, just to be sure all is working
@@ -44,7 +46,8 @@ For our first graph using the r2d3 package we installed and loaded above we will
 
 
 ```{r}
-
+library(r2d3)
+r2d3(data=c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "barchart.js")
 ```
 
 You just created your first d3 visualization! Not all that special, but we will get more sophisticated. 
@@ -53,6 +56,12 @@ Question 1. Recreate the above barchart using ggplot2. Put the code in the box b
 
 
 ```{r}
+data <- data.frame(x = c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20))
+
+ggplot(data, aes(seq_along(x))) +
+  geom_bar(aes(y = x),stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  theme_void()
 
 ```
 
@@ -61,19 +70,20 @@ Now lets get a little more sophisticated. Take a look at the d3.js example libra
 Now we will run a chord diagram example. This time we need a javascript file and a css file to provide the necessary styles for the chord. I also put all my css files in a css folder inside my project directory, to keep things organized. This example is from https://rstudio.github.io/r2d3/articles/gallery/chord/ 
 
 ```{r}
-r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "./js/chord.js", css = "./css/chord.css")
-
+r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "../Visualization_HW4/chord.js", css = "../Visualization_HW4/chord.css")
 ```
 
-Question 2. Rewrite the code without the css and run it. How different is it? Include the code below:
+Question 2. Rewrite the code without the css and run it. How different is it? Include the code below:  
+
+**ANSWER:** There are fewer arms connecting the different values in the circle without the css code. 
 
 ```{r}
-
+r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "../Visualization_HW4/chord.js")
 ```
 
 Now lets experiment with a heatmap using heatmaply. At least in my environment, the mtcars dataset is installed by default. 
 
-```{r}
+```{r warnign = FALSE}
 heatmaply(mtcars)
 ```
 
@@ -91,11 +101,16 @@ heatmaply(
 Question 3. Specifying a normalization method, like percentize above, can aid in the interpretation. However, answering questions like 'which car has the best mpg' is hard to do with this method. Look through the different heatmaply options and find a heatmap you think is useful in understanding which cars have the best (and worst) mpg. Put the code below:
 
 ```{r}
-
+heatmaply(
+  normalize(mtcars),
+  xlab = "Features",
+  ylab = "Cars", 
+  main = "Data transformation using 'normalize'"
+)
 ```
 
-Question 4. What car has the best mpg (highest number) and which one has the worst (lowest number). Write them below:
-
+Question 4. What car has the best mpg (highest number) and which one has the worst (lowest number). Write them below:  
+**ANSWER: ** Toyota Corolla with a normalized value of 1 would have the best mpg and the Lincoln Continential & Cadillac Fleetwood have the worst mpg with a normalized value of 0. The normalized data places everything on the same scale between 0-1 so that it is easier to compare across and it's visually more clear as well. 
 
 Next, we will build correlative heatmap, where the colors are related to the correlation between data points:
 
@@ -115,7 +130,28 @@ There is a lot of hard work that heatmaply did in building that correlated heat 
 Question 5. Now build a heatmap that uses point sources to indicate correlation and p-value. Include the code below. 
 
 ```{r}
+r <- cor(mtcars)
+## We use this function to calculate a matrix of p-values from correlation tests
+## https://stackoverflow.com/a/13112337/4747043
+cor.test.p <- function(x){
+    FUN <- function(x, y) cor.test(x, y)[["p.value"]]
+    z <- outer(
+      colnames(x), 
+      colnames(x), 
+      Vectorize(function(i,j) FUN(x[,i], x[,j]))
+    )
+    dimnames(z) <- list(colnames(x), colnames(x))
+    z
+}
+p <- cor.test.p(mtcars)
 
+heatmaply_cor(
+  r,
+  node_type = "scatter",
+  point_size_mat = -log10(p), 
+  point_size_name = "-log10(p-value)",
+  label_names = c("x", "y", "Correlation")
+)
 ```
 
 Now we are going to shift to yet another d3.js based graph type, a force network. There is a package that wraps all the code necessary to do that, to make it very easy:
@@ -149,6 +185,21 @@ Question 6. Take another data set (include it in your homework submission please
 Put your code in the section below:
 
 ```{r}
+covid_recovered <- read.csv("/Users/hannahdamico/Downloads/archive (1)/time_series_covid_19_recovered.csv")
+MisLinks_Covid <- covid_recovered %>% select(Country.Region, Lat, Long)
+MisNodes_Covid <- covid_recovered %>% select(Province.State, Country.Region, X4.18.20)
+
+bigcities <- read.csv("/Users/hannahdamico/Desktop/W22/BIOSTAT 706/Project 1/Shannon Reproducibility/Reproducibility/BigCitiesHealth.csv")
+# Source, target, value
+MisLinks_BC <- data.frame(source = MisLinks$source, target = MisLinks$target, value = sample_n(bigcities, size = nrow(MisLinks))$value)
+# name, group, size
+MisNodes_BC <- data.frame(name = sample_n(bigcities, size = nrow(MisNodes))$geo_label_city, group = sample_n(bigcities, size = nrow(MisNodes))$strata_race_label, size = MisNodes$size*1.5)
+
+forceNetwork(Links = MisLinks_BC, Nodes = MisNodes_BC, Source = "source",
+             Target = "target", Value = "value", NodeID = "name",
+             Nodesize = "size",
+             radiusCalculation = "d.nodesize/2+1",
+             Group = "group", opacity = 0.85, zoom = TRUE, arrows = TRUE)
 
 ```
 
@@ -158,7 +209,7 @@ To run the following script, you need to download the flare.csv file and bubbles
 See https://rstudio.github.io/r2d3/articles/gallery/bubbles/ and https://github.com/rstudio/r2d3/tree/master/vignettes/gallery/bubbles 
 
 ```{r}
-r2d3(data = read.csv("flare.csv"), width=400, height=400, d3_version = 4, script = "./js/bubbles.js")
+r2d3(data = read.csv("../Visualization_HW4/flare.csv"), width=400, height=400, d3_version = 4, script = "../Visualization_HW4/bubbles.js")
 ```
 
 
@@ -167,14 +218,22 @@ Question 7. Find an appropriate dataset and visualize it using a bubble plot. In
 Put your code below:
 
 ```{r}
+options(scipen = 999)
+smallcities <- bigcities %>% select(metric_subcat_label, value) 
+smallcities <- sample_n(smallcities, size = 1000)
 
+r2d3(data = smallcities, width=1500, height=1500, d3_version = 4, script = "../Visualization_HW4/bubbles.js")
 ```
 
 Finally, we are going to graph this same data in a radial tree. This is also a graph representation. We are going to use the same data as in the bubble graph. https://rstudio.github.io/r2d3/articles/gallery/radialtree/ has the javascript and css files.
 
 ```{r}
-r2d3(data = read.csv("flare.csv"), d3_version = 4, script = "./js/radialtree.js")
-r2d3(data = read.csv("flare.csv"), d3_version = 4, script = "./js/radialtree.js", css = "./css/radialtree.css")
+r2d3(data = read.csv("../Visualization_HW4/flare.csv"), d3_version = 4, script = "../Visualization_HW4/radialtree.js")
+```
+
+```{r}
+
+r2d3(data = read.csv("../Visualization_HW4/flare.csv"), d3_version = 4, script = "../Visualization_HW4/radialtree.js", css = "../Visualization_HW4/radialtree.css")
 ```
 
 This generates two different radialtree graphs. If they look identical, you may not have the css file in the right place for it to be loaded. 
@@ -192,14 +251,18 @@ https://gist.githubusercontent.com/mbostock/4090846/raw/us.json
 Building the cartogram is a lengthy process. It will take multiple seconds depending on the computer you run it on.  
 
 ```{r}
-r2d3(data = jsonlite::read_json("us.json"), d3_version = 3, dependencies = "./js/topojson.min.js", script = "./js/cartogram.js")
-r2d3(data = jsonlite::read_json("us.json"), d3_version = 3, dependencies = "./js/topojson.min.js", script = "./js/cartogram.js", css = "./css/cartogram.css")
+r2d3(data = jsonlite::read_json("../Visualization_HW4/topojson/us.json"), d3_version = 3, dependencies = "../Visualization_HW4/topojson/topojson.min.js", script ="../Visualization_HW4/cartogram.js")
+```
+
+```{r} 
+r2d3(data = jsonlite::read_json("../Visualization_HW4/topojson/us.json"), d3_version = 3, dependencies = "../Visualization_HW4/topojson/topojson.min.js", script = "../Visualization_HW4/cartogram.js", css = "../Visualization_HW4/cartogram.css")
 ```
 
 These two graphs should look different, assuming the css file is loaded. 
 
 Question 9. What are the differences between the css cartogram and the cartogram without the css file.
 
+**ANWSER: ** There aren't any big differences?
 
 Question 10. Extra credit.  Take a look at https://observablehq.com/@d3/non-contiguous-cartogram The data for obesity is manually loaded into the r2d3 javascript file, but it is not changing the color of the states based on the obesity rates in each state. Can you fix the javascript to make it properly color the state? This will require javascript coding skill as well as troubleshooting. It may not be possible to fix, since the authors of the r2d3 example were unable to make it work, even with the d3 example available. 
 

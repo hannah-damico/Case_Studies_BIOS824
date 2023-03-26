@@ -1,6 +1,6 @@
 ---
 title: "Data wrangling and reverse engineering"
-output: html_notebook
+output: pdf_document
 ---
 
 This is a hopefully straightforward set of tasks. As part of the homework you will find the file RADxUP_CDE_Tracking_full.csv
@@ -10,15 +10,39 @@ This is a file saved from a fairly complicated set of questionnaires from a real
 Task 1. Create the code necessary to load the file and prepare it for heatmaply. Insert the code below. 
 
 ```{r}
-
+rad_data <- read.csv("../Visualization_HW4/RADxUP_CDE_Tracking_full.csv")
+dim(rad_data)
 ```
+ 
+How many rows and columns are in the file?  
+Number of rows: `r dim(rad_data)[1]`
 
-How many rows and columns are in the file? 
-
+Number of columns: `r dim(rad_data)[2]`
 
 Task 2. Create a simple heatmap using heatmaply that replicates/approximates the heatmap I put in the homework. Insert your code and heatmap below. Note that you will need to adjust the fontsize or else the plotsize to make the project names legible. 
 
 ```{r}
+library(arsenal)
+TNE <- c("Johns Hopkins University", "Washington State University", " Montana State University - Bozeman")
+
+# rad_data %>% filter(Tribal.Nation.exception == TRUE)
+map_data_NA <- rad_data %>%  filter(Awardee.Name %nin% TNE)
+
+heatmaply(
+  map_data_NA,
+  xlab = "Features",
+  ylab = "Cars",
+  main = "Data"
+)
+
+# heatmaply_na(
+#   rad_data[2:ncol(rad_data)],
+#   showticklabels = c(TRUE, FALSE),
+#   k_col = 3,
+#   k_row = 3,
+#   # fontsize_row = 6,
+#   # fontsize_col = 6
+# )
 
 ```
 
